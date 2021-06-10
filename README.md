@@ -199,7 +199,7 @@ Push our new nyancat-windows image to ECR:
 
 Now we'll take our nyancat container and run it on ECS
 
-1. Go back to your terminal in Cloud9
+Go back to your terminal in Cloud9 and:
 1. Run `sudo npm install -g aws-cdk`
 1. Run `cd ~/environment/docker-ecs-immersion/windows`
 1. Run `pip install -r requirements.txt`
