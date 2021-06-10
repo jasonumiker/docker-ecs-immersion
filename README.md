@@ -139,12 +139,14 @@ However, we have added [higher-level constructs](https://docs.aws.amazon.com/cdk
     1. Create an ALB
     1. Create an ECS Fargate Task Definition
     1. And create and ECS Service to run/scale/heal that and manage its ALB Target Group for us.
+1. Run `nvm install --lts`
 1. Run `sudo npm install --upgrade -g aws-cdk`
 1. Run `npm upgrade`
 1. Run `npm install`
-1. Run `/usr/bin/cdk synth`
+1. Run `cdk synth`
 1. Note that this is the CloudFormation that the few lines of CDK we cat-ed above has turned into.
-1. Deploy that with a `/usr/bin/cdk deploy`
+1. Run `cdk bootstrap`
+1. Deploy that with a `cdk deploy`
 1. Answer `y` to the security confirmation and press Enter
 
 ## Windows Containers
@@ -201,10 +203,7 @@ Now we'll take our nyancat container and run it on ECS
 1. Run `sudo npm install -g aws-cdk`
 1. Run `cd ~/environment/docker-ecs-immersion/windows`
 1. Run `pip install -r requirements.txt`
-1. Run `export CDK_DEPLOY_ACCOUNT=$(curl http://169.254.169.254/latest/dynamic/instance-identity/document|grep accountId| awk '{print $3}'|sed  's/"//g'|sed 's/,//g')` or `export CDK_DEPLOY_ACCOUNT=[Your acct #]`
-1. Run `export CDK_DEPLOY_REGION=ap-southeast-2`
 1. Run `cdk deploy`
-
 
 ## ECS Anywhere
 

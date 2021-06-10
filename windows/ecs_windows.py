@@ -90,16 +90,5 @@ class ECSWindowsStack(core.Stack):
         )
 
 app = core.App()
-if app.node.try_get_context("account").strip() != "":
-    account = app.node.try_get_context("account")
-else:
-    account = os.environ.get("CDK_DEPLOY_ACCOUNT", os.environ["CDK_DEFAULT_ACCOUNT"])
-
-if app.node.try_get_context("region").strip() != "":
-    region = app.node.try_get_context("region")
-else:
-    region = os.environ.get("CDK_DEPLOY_REGION", os.environ["CDK_DEFAULT_REGION"])
-# Note that if we didn't pass through the ACCOUNT and REGION from these environment variables that
-# it won't let us create 3 AZs and will only create a max of 2 - even when we ask for 3 in eks_vpc
-ecs_windows_stack = ECSWindowsStack(app, "ECSWindowsStack", env=core.Environment(account=account, region=region))
+ecs_windows_stack = ECSWindowsStack(app, "ECSWindowsStack")
 app.synth()
