@@ -1,5 +1,5 @@
 { 
-    "app": "python ecs_windows.py",
+    "app": "python3 ecs_windows.py",
     "context": {
         "account": "",
         "region": ""
