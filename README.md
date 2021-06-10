@@ -92,32 +92,58 @@ Then go back to the Terminal in our Cloud9 and:
     1. Enter `nyancat` as the name of our application
 1. Then we'll create our [environment](https://aws.github.io/copilot-cli/docs/concepts/environments/) by running `copilot env init`
     1. Enter 'dev' as the name of the environment
-    1. Use the arrows to select `[profile default]` for the credentials and press Enter. This will use the default credentials of the IAM Role assigned to our EC2 instance.
-    1. Use the arrows to select `Yes, use default.` for the network and press Enter. We could instead customise the CIDRs or choose and existing VPCs/subnets if we wanted here but for our workshop we'll let it create a new network with its default settings.
-1. Next, we'll create or [service]() by running `copilot svc init`
-    1. Use the arrows to select `Load Balanced Web Service` and press Enter.
+    1. Use the down arrow to select `[profile default]` for the credentials and press Enter. This will use the default credentials of the IAM Role assigned to our EC2 instance.
+    1. Press Enter to select `Yes, use default.` for the network and press Enter. We could instead customise the CIDRs or choose and existing VPCs/subnets if we wanted here but for our workshop we'll let it create a new network with its default settings.
+1. Next, we'll create or [service](https://aws.github.io/copilot-cli/docs/concepts/services/) by running `copilot svc init`
+    1. Use the down arrows to select `Load Balanced Web Service` and press Enter.
     1. Enter `www` for the name
-    1. Use the arrows to select `Enter custom path for your Dockerfile` and press Enter
-    1. Enter `/home/ec2-user/environment/aws-cdk-nyan-cat/nyan-cat/Dockerfile` for the path
+    1. Use the down arrow twice to select `Enter custom path for your Dockerfile` and press Enter
+    1. Enter `/home/ec2-user/environment/docker-ecs-immersion/aws-cdk-nyan-cat/nyan-cat/Dockerfile` for the path
     1. Press Enter to select the default port of 80
-    1. This actually just generated a manifest file that we can use to deploy. Have a look at it - `copilot/www/manifest.yml`. The schema available to you to customise this service is documented at https://aws.github.io/copilot-cli/docs/manifest/lb-web-service/
+    1. This actually just generated a manifest file that we can use to deploy. Have a look at it with `cat copilot/www/manifest.yml`. The schema available to you to customise this service is documented at https://aws.github.io/copilot-cli/docs/manifest/lb-web-service/
 1. Finally, we'll deploy our new service to our new environment by running `copilot svc deploy --name www --env dev`. This will:
     1. Build the container locally with a `docker build`
     1. Push it to the Elastic Container Registry (ECR)
-    1. Deploy the service to ECS Fargate behind an ALB
-1. That step will output the URL to the new ALB you can go to in your browser to see our nyancat container running on the Internet!
+    1. Deploy it as a Service (which scales/heals ECS Tasks similar to an Auto Scaling Group on EC2) on ECS Fargate behind an ALB
+    1. Output the URL to the new ALB you can go to in your browser to see our nyancat container running on the Internet!
 
 This was all actually done via CloudFormation and you can go to the CloudFormation service in the AWS Console and see separate stacks for the application, for the environment and for the service. If you go into those you can see the Templates that copilot generated and deployed for you. If you choose not not use copilot then you can be inspired by these Templates to make your own to manage ECS directly.
 
-TODO: Give them a tour around the ECS and EC2 consoles all the things that were provisioned (ECS Cluster/Service/Tasks, ALB, etc.)
+TODO: Give them a tour around the ECS and EC2 service consoles all the things that were provisioned (ECS Cluster/Service/Tasks, ALB, etc.)
 
 ### AWS Copilot CI/CD Pipeline
 
-TODO: Show them how copilot can provision a pipeline to build/deploy as well
+Rather than building our container on the machine that we run copilot CLI from (our laptop etc.), [copilot can set up a CI/CD pipeline in the cloud based on AWS CodePipeline/CodeBuild for us too](https://aws.github.io/copilot-cli/docs/concepts/pipelines/).
+
+1. Run `copilot pipeline init`
+1. Press Enter to accept the `dev` environment default
+1. Press Enter to accept the repository
+1. Note the `buildspec.yml` and `pipeline.yml` files that it generated
+1. If you were to run `copilot pipeline update` it would deploy that pipeline for you - but you'd have to administrative permissions to the git repo to both pull it as well as create the webhook(s) to trigger the builds when you merge.
+
+[(Optional) Demo this for the attendees if they'd like to see it]
+
+TODO: Write instructions to fork this Github repo to the attendee's own account and then do all the copilot steps out of their fork to allow the pipeline steps to work.
 
 ### AWS Cloud Development Kit (CDK)
 
-TODO: CDK Example
+The AWS Cloud Development Kit as we discussed also generates CloudFormation for you. But while copilot is focused and opinionated to keep things simple, CDK is a more general tool that can allow you to do literally anything that you can do in AWS however you'd like it done.
+
+However, we have added [higher-level constructs](https://docs.aws.amazon.com/cdk/api/latest/docs/aws-ecs-patterns-readme.html) that build on the foundational constructs/classes of the CDK to get closer to the simplicity of copilot when it comes to many areas like ECS too.
+
+1. Run `cd ~/environment/docker-ecs-immersion/aws-cdk-nyan-cat/cdk`
+1. Run `cat lib/cdk-stack.ts`
+1. Note that there is one line to create the VPC (and this automatically will create a 'proper' VPC with public and private subnets and NAT gateways etc.), one to create the ECS Cluster and then a a construct called `ApplicationLoadBalancedFargateService`. That construct will:
+    1. Build the container locally on the machine we're running the CDK on
+    1. Create an ECR Repository and push it to that
+    1. Create an ALB
+    1. Create an ECS Fargate Task Definition
+    1. And create and ECS Service to run/scale/heal that and manage its ALB Target Group for us.
+1. Run `npm install`
+1. Run `cdk synth`
+1. Note that this is the CloudFormation that the few lines of CDK we cat-ed above has turned into.
+1. Deploy that with a `cdk deploy`
+1. Answer `y` to the security confirmation and press Enter
 
 ## Windows Containers
 
