@@ -1,0 +1,6 @@
+[submodule "aws-cdk-nyan-cat"]
+	path = aws-cdk-nyan-cat
+	url = https://github.com/nathanpeck/aws-cdk-nyan-cat
+[submodule "top-spring-boot-docker"]
+	path = top-spring-boot-docker
+	url = https://github.com/spring-guides/top-spring-boot-docker.git
