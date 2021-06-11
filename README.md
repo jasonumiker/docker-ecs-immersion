@@ -175,7 +175,7 @@ Use Windows Docker locally on the instance:
 1. Note how huge the image is and how long it takes it to both download and extract - 1/2 of Windows needs to be within the Windows container images and this makes them slow to pull/start/scale/heal compared to Linux
 1. Go to `http://localhost:8080` in IE and see the default IIS site
 1. Run `docker stop iis` to stop the container
-TODO: Add instructions for getting nyancat on the machine (.zip in the git repo they can download from github?)
+1. Download the nyancat content from this URL 
 1. Run `cd c:\aws-cdk-nyan-cat`
 1. Run `cat Dockerfile` and see how Dockerfiles on Windows are similar but you use Powershell instead of the unix shell
 1. Run `docker build -t nyancat-windows .` to delete the default site and put our nyancat in its place
@@ -183,7 +183,9 @@ TODO: Add instructions for getting nyancat on the machine (.zip in the git repo 
 1. Run `docker run --rm -d --name nyancat-windows -p 8080:80 nyancat-windows` to run our nycat on Windows via IIS
 1. Go to `http://localhost:8080` in IE and see it running
 1. Run `docker stop nyancat-windows` to stop the container
-
+1. Run `Invoke-WebRequest -uri "https://github.com/jasonumiker/docker-ecs-immersion/raw/main/nyancat-windows.zip" -Method "GET"  -Outfile nyancat-windows.zip`
+1. Right click on the nyancat-windows.zip and click `Extract All` then click Extract
+1. `cd nyancat-windows`
 Push our new nyancat-windows image to ECR:
 1. Install the AWS CLI by running `msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi` in Powershell
 1. Restart Powershell so the AWS CLI is now in the PATH
