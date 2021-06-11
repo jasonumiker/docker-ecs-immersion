@@ -204,13 +204,37 @@ Go back to your terminal in Cloud9 and:
 1. Run `cd ~/environment/docker-ecs-immersion/windows`
 1. Run `pip install -r requirements.txt`
 1. Run `cdk deploy`
+1. Go to the ALB address output at the end of the deployment to see our nyancat hosted by IIS on Windows via ECS
 
 ## ECS Anywhere
 
-### Demo of deploying to my Linux laptop
+In order to run ECS Anywhere you need a machine with systemd and Docker. This could be anything from bare metal on a raspberry pi to a VM to even Docker-in-Docker.
 
-TODO: Linux Laptop example
+The easiest way to test this is using Docker-in-Docker on the Cloud9 that we've already been using Docker on.
 
-### Workshop of deploying to EC2 (pretending it is not in the AWS region)
+The Dockerfile in the ecsanywhere folder will build an Amazon Linux 2 container that has both systemd and docker that can serve as an ECS Anywhere sandbox for us.
 
-(Stretch goal) TODO: Workshop for attendees
+On the Cloud9:
+1. `cd ~/environment/docker-ecs-immersion/ecsanywhere`
+1. `docker build -t ecsanywhere-dind .`
+1. `docker run -d --privileged --name ecsanywhere -p 8080-8090:8080-8090 ecsanywhere-dind:latest`
+1. `docker exec -it ecsanywhere /bin/bash`
+
+We'll paste the command to join this to Systems manager and ECS into that interactive shell within the container in a moment.
+
+Then in the AWS Console:
+1. Go to the ECS Service
+1. Click the blue `Create Cluster` button
+1. Choose Networking only (should already be selected by default) and click the blue `Next step` button
+1. Type `ECSAnywhere` for the Cluster name, click the box to enable CloudWatch Container Insights, and then click the blue `Create` button
+1. Click the blue `View Cluster` button
+1. Go to the ECS Instances tab in the middle of hhe console
+1. Click the `Register External Instances` button
+1. Click the blue `Next step` button
+1. Click the blue `Copy` button to copy the command we need to the clipboard
+
+Then just paste that command in to the interactive shell within our ecsanywhere-dind container to register this container against both SSM and ECS Anywhere.
+
+Once you have started the container you can do a `docker stop ecsanywhere` to pause it and `docker start ecsanywhere` to start it up again when you need - it'll retain the ECS cluster membership until you do a `docker rm` and remove the container from your system.
+
+To remove it from both SSM and ECS Anywhere go to the Fleet Manager in the SMS service and deregister it there.
