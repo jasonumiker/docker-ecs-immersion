@@ -82,7 +82,7 @@ First we'll need to give AWS Administrator Access to our Cloud9 Instance:
 1. Enter `EC2FullAdmin` foe the `Role name` and then click `Create role`
 1. Go to the `Instances` section of the EC2 service in the AWS Console
 1. Tick the box to the left of our cloud9 instance
-1. Click `Actions` -> `Security` -> `Modify IAM Role` then choose `ECSFullAdmin` and click `Save`
+1. Click `Actions` -> `Security` -> `Modify IAM Role` then choose `EC2FullAdmin` and click `Save`
 
 Then go back to the Terminal in our Cloud9 and:
 1. Run `aws configure set default.region ap-southeast-2` to set our default region to Sydney
