@@ -83,8 +83,11 @@ First we'll need to give AWS Administrator Access to our Cloud9 Instance:
 1. Go to the `Instances` section of the EC2 service in the AWS Console
 1. Tick the box to the left of our cloud9 instance
 1. Click `Actions` -> `Security` -> `Modify IAM Role` then choose `ECSFullAdmin` and click `Save`
+1. Go to the Cloud9 tab and click on the gear in the upper right hand corner
+1. In the Preferences tab go to AWS Settings on the left then turn off AWS Managed Temporary credentials
+1. Close the Preferences tab
 
-Then go back to the Terminal in our Cloud9 and:
+Then go back to the Terminal tab in our Cloud9 and:
 1. Run `aws configure set default.region ap-southeast-2` to set our default region to Sydney
 1. Run `curl -Lo copilot https://github.com/aws/copilot-cli/releases/latest/download/copilot-linux && chmod +x copilot && sudo mv copilot /usr/local/bin/copilot` to install Copilot
 1. Run `cd ~/environment/docker-ecs-immersion`
