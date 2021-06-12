@@ -44,7 +44,7 @@ We'll start by setting up a Cloud9 which is an EC2 instance accessible via a bro
 1. Run `cd ~/environment/docker-ecs-immersion/aws-cdk-nyan-cat/nyan-cat`
 1. Run `cat Dockerfile` - this is start from the upstream nginx:alpine image (alpine is a slimmer base image option offered by nginx and many other base images) and then copy the contents of this path into /usr/share/nginx/html in our container replacing the default page it ships with
 1. Run `docker build -t nyancat .` to build an image called nyancat:latest from that Dockerfile
-1. Run `docker history nginx:latest` to see all of the commands and layers that make up the image - see our new layer?
+1. Run `docker history nyancat:latest` to see all of the commands and layers that make up the image - see our new layer?
 1. Run `docker run --rm -d -p 8080:80 --name nyancat nyancat:latest` 
 1. Click on the `Preview` menu in the middle of the top bar then choose `Preview running application`. This opens a proxied browser tab on the right to show what is running on localhost port 8080 on our Cloud9 EC2 instance. Click the `Pop Out Into New Window` icon in the upper right hand corner of that right pane to give it its own tab then close the preview tab.
     1. See our new content that is built into the image for nginx to serve?
