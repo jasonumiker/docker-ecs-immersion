@@ -168,36 +168,41 @@ Create and log into a Windows EC2 Instance:
 1. Click the `Launch button` then `Create a new key pair` from the dropdown then enter the name `workshop-windows-bastion` and click `Download Key Pair`
 1. Then click the blue `Launch Instances` button
 1. Go back to the EC2 Instances view and tick the new instance there to select it
-1. Click `Actions` -> `Security` -> `Modify IAM Role` then choose `ECSFullAdmin` and click `Save`
+1. Click `Actions` -> `Security` -> `Modify IAM Role` then choose `EC2FullAdmin` and click `Save`
 1. Click the `Connect` button then choose the `RDP client` tab then click the `Download remote desktop file` button and then click `Get password`
 1. Browse to the certificate file you just downloaded and click `Decrypt Password`
 1. Copy the Password that has been revealed to your clipboard and then open the .RDP file you downloaded to log into the Windows Bastion
 
 Use Windows Docker locally on the instance:
+1. Open PowerShell
 1. Run `docker version` to see that Docker for Windows is built-in to this AMI and ready to go
 1. Run `docker run --rm -d --name iis -p 8080:80 mcr.microsoft.com/windows/servercore/iis` to run stock IIS
 1. Note how huge the image is and how long it takes it to both download and extract - 1/2 of Windows needs to be within the Windows container images and this makes them slow to pull/start/scale/heal compared to Linux
-1. Go to `http://localhost:8080` in IE and see the default IIS site
+1. Open Internet Explorer and Go to `http://localhost:8080`. You will see the default IIS site
 1. Run `docker stop iis` to stop the container
-1. Download the nyancat content from this URL 
-1. Run `cd c:\aws-cdk-nyan-cat`
+
+ Now lets launch the nyancat content:
+1. In PowerShell
+1. Run `Invoke-WebRequest -uri "https://github.com/jasonumiker/docker-ecs-immersion/raw/main/nyancat-windows.zip" -Method "GET"  -Outfile nyancat-windows.zip`
+1. Unzip the files. Run `Expand-Archive -Path nyancat-windows.zip -DestinationPath C:\nyancat-windows`
+1. Run `cd c:\nyancat-windows`
 1. Run `cat Dockerfile` and see how Dockerfiles on Windows are similar but you use Powershell instead of the unix shell
 1. Run `docker build -t nyancat-windows .` to delete the default site and put our nyancat in its place
 1. Note how since we had already download the IIS base layers we are building on they were cached really speeding things up
 1. Run `docker run --rm -d --name nyancat-windows -p 8080:80 nyancat-windows` to run our nycat on Windows via IIS
 1. Go to `http://localhost:8080` in IE and see it running
 1. Run `docker stop nyancat-windows` to stop the container
-1. Run `Invoke-WebRequest -uri "https://github.com/jasonumiker/docker-ecs-immersion/raw/main/nyancat-windows.zip" -Method "GET"  -Outfile nyancat-windows.zip`
-1. Right click on the nyancat-windows.zip and click `Extract All` then click Extract
-1. `cd nyancat-windows`
+
 Push our new nyancat-windows image to ECR:
 1. Install the AWS CLI by running `msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi` in Powershell
 1. Restart Powershell so the AWS CLI is now in the PATH
-1. Go to the ECR service in the AWS Console
-1. Click the orange `Create repository` button
+1. Run `cd c:\nyancat-windows`
+1. Go to the AWS Console and go to the Elastic Container Registry (Amazon ECR)
+1. Click the orange `Get Started` button
 1. Type `nyancat-windows` for the repository name then click `Create repository`
-1. Enter the repository then click the `View push commands` button
-1. Copy and paste the first command to log in
+1. Enter the repository then click the `View push commands` button in the top right of the scree
+1. Select the Windows Tab
+1. Copy the first command and paste into PowerShell in your RDP session. This will log in
 1. Copy and paste the third command to re-tag our image (we already did the build in step 2)
 1. Copy and paste the fourth command to push the image
 
