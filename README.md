@@ -249,3 +249,40 @@ Then just paste that command in to the interactive shell within our ecsanywhere-
 Once you have started the container you can do a `docker stop ecsanywhere` to pause it and `docker start ecsanywhere` to start it up again when you need - it'll retain the ECS cluster membership until you do a `docker rm` and remove the container from your system.
 
 To remove it from both SSM and ECS Anywhere go to the Fleet Manager in the SMS service and deregister it there.
+
+But we'll leave it up and running for now to show deploying a Task to it.
+
+### Deploying nyancat to our ECS Anywhere
+
+We already had pushed our Linux nyancat image twice - one with copilot and once with CDK. So we'll use that image. But we'll create a new Task Definition and Service manually in the console and to deploy it to our ECS Anywhere Docker-in-Docker environment.
+
+First we'll find the image URI in the ECR console:
+1. Go to the ECR service in the AWS Console
+1. Click on the blue name/link for `nyancat/www`
+1. Click on the squares to the left of the URI for `nyancat-www` to copy the URI path to the right of the squares - or highlight the path and copy it yourself.
+
+Then we'll deploy it to ECS Anywhere:
+1. Go to the ECS Service in the AWS Console
+1. Go to Task Definitions on the Left Hand pane
+1. Click on the blue `Create new Task Definition` button
+1. Choose `EXTERNAL` and then click the `Next step` button
+1. Enter `nyancat-external` for the Task Definition Name
+1. Choose `nyancat-dev-www-TaskRole` for the Task Role dropdown
+1. Choose `nyancat-dev-www-ExecutionRole` for the Task execution role
+1. Click the blue `Add container` button
+1. Paste in the ECR URI from above
+1. Enter a hard limit of 1024
+1. Enter 8080 for Host port and 80 for Container port in Port Mappings
+1. Click the Add button the bottom of the Add container pane
+1. Click the Create button on the bottom right
+1. Click the JSON tab - we could have written this ourselves or used CDK to generate it but the console can help us click around with what we want and it'll generate it for us too.
+1. Click on the `Actions` button and then choose `Create Service`
+1. Pick EXTERNAL for the `Launch type`
+1. Pick the `ECSAnywhere` cluster from the dropdown
+1. Enter `nyancat-external` for the `Service name`
+1. Enter 1 for the number of tasks
+1. Click the blue `Next step` button at the bottom
+1. Click the `Review and create` button
+1. Click the `Create Service` button
+1. Click the `View Service` button
+1. Once the Task has successfully started you should be able to see it on http://localhost:8080 from within Cloud9
