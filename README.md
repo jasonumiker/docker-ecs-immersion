@@ -23,19 +23,20 @@ We'll start by setting up a Cloud9 which is an EC2 instance accessible via a bro
 ### Example of running stock nginx from Docker Hub
 
 1. Run `docker run -d -p 8080:80 --name nginx nginx:latest` to run nginx in the background as a daemon as well as map port 8080 on our host to 80 in the container
+    1. The -d is to run it as a daemon (in the background), the -p maps the host port 8080 to 80 in the container, --name gives us a name we can run further docker commands against easily and then the image repository and tag we want to run.
     1. Run `docker ps` to see our container running
-    1. Click on the `Preview` menu in the middle of the top bar then choose `Preview running application`. This opens a proxied browser tab on the right to show what is running on localhost port 8080 on our Cloud9 EC2 instance. Click the `Pop Out Into New Window` icon in the upper right hand corner of that right pane to give it its own tab then close the preview tab.
+    1. Click on the `Preview` menu in the middle of the top bar then choose `Preview running application`. This opens a proxied browser tab on the right to show what is running on localhost port 8080 on our Cloud9 EC2 instance. Click the `Pop Out Into New Window` icon in the upper right-hand corner of that right pane to give it its own tab then close the preview tab.
     1. Run `docker logs nginx --follow` to tail the logs the container is sending to STDOUT (including its access logs)
     1. Refresh the preview in the separate browser tab a few times and then come back to see the new log line entries
         1. **NOTE** For some reason refreshing this within Cloud9 sometimes doesn't leave these log lines - do it in the separate tab within your browser
     1. Press Ctrl-C to exit the log tailing
-    1. Run `docker exec -it nginx /bin/bash` to open a shell *within* our container
+    1. Run `docker exec -it nginx /bin/bash` to open a shell *within* our container (-it means interactive)
     1. Run `cd /usr/share/nginx/html` then `cat index.html` to see the content the nginx is serving which is part of the container.
     1. Run `echo "Test" > index.html` and then refresh the browser preview tab to see the content change
         1. If we wanted to commit this change to the image as a new layer we could do it with a `docker commit` - otherwise it'll stay in this container but be reverted if you go back to the image.
     1. Run `exit` to exit our interactive shell
 1. Run `docker stop nginx` to stop our container
-1. Run `docker ps -a` to see that our container is still there but stopped. At this point it could be restarted with a `docker start nginx` if we wanted.
+1. Run `docker ps -a` (-a means all including the stopped containers) to see that our container is still there but stopped. At this point it could be restarted with a `docker start nginx` if we wanted.
 1. Run `docker rm nginx` to remove the stopped container from our machine then another `docker ps -a` to confirm it is now gone
 1. Run `docker images` to see that the nginx:latest image is there there cached
 1. Run `docker rmi nginx:latest` to remove the nginx image from our machine's local cache
@@ -45,7 +46,7 @@ We'll start by setting up a Cloud9 which is an EC2 instance accessible via a bro
 1. Run `cat Dockerfile` - this is start from the upstream nginx:alpine image (alpine is a slimmer base image option offered by nginx and many other base images) and then copy the contents of this path into /usr/share/nginx/html in our container replacing the default page it ships with
 1. Run `docker build -t nyancat .` to build an image called nyancat:latest from that Dockerfile
 1. Run `docker history nyancat:latest` to see all of the commands and layers that make up the image - see our new layer?
-1. Run `docker run --rm -d -p 8080:80 --name nyancat nyancat:latest` 
+1. Run `docker run --rm -d -p 8080:80 --name nyancat nyancat:latest` (--rm means to delete the container once it is stopped rather than leave it around to be restarted) 
 1. Click on the `Preview` menu in the middle of the top bar then choose `Preview running application`. This opens a proxied browser tab on the right to show what is running on localhost port 8080 on our Cloud9 EC2 instance. Click the `Pop Out Into New Window` icon in the upper right hand corner of that right pane to give it its own tab then close the preview tab.
     1. See our new content that is built into the image for nginx to serve?
 1. Run `docker stop nyancat` to stop and clean up that container (we said --rm so Docker will automatically clean it up when it stops)
@@ -122,12 +123,10 @@ Rather than building our container on the machine that we run copilot CLI from (
 1. Run `copilot pipeline init`
 1. Press Enter to accept the `dev` environment default
 1. Press Enter to accept the repository
-1. Note the `buildspec.yml` and `pipeline.yml` files that it generated
-1. If you were to run `copilot pipeline update` it would deploy that pipeline for you - but you'd have to administrative permissions to the git repo to both pull it as well as create the webhook(s) to trigger the builds when you merge.
+1. Note the `buildspec.yml` and `pipeline.yml` files that it generated - have a look at them.
+1. (Don't actually run this) If you were to run `copilot pipeline update` it would deploy that pipeline for you from those files - but you'd have to administrative permissions to the git repo to both pull it as well as create the webhook(s) to trigger the builds whenever you merge. Rather than walk you through creating a GitHub account and doing it take our word for it.
 
 [(Optional) Demo this for the attendees if they'd like to see it]
-
-TODO: Write instructions to fork this Github repo to the attendee's own account and then do all the copilot steps out of their fork to allow the pipeline steps to work.
 
 ### AWS Cloud Development Kit (CDK)
 
@@ -143,15 +142,15 @@ However, we have added [higher-level constructs](https://docs.aws.amazon.com/cdk
     1. Create an ALB
     1. Create an ECS Fargate Task Definition
     1. And create and ECS Service to run/scale/heal that and manage its ALB Target Group for us.
-1. Run `nvm install --lts`
-1. Run `sudo npm install --upgrade -g aws-cdk`
-1. Run `npm upgrade`
-1. Run `npm install`
-1. Run `cdk synth`
+1. Run `nvm install --lts` to install the LTS version of node.js needed to run the CDK
+1. Run `sudo npm install --upgrade -g aws-cdk` to install the CDK via npm
+1. Run `npm upgrade` to update the package.json to the latest available package versions
+1. Run `npm install` to install the packages needed from npm
+1. Run `cdk synth` to generate the CloudFormation template from our CDK template
 1. Note that this is the CloudFormation that the few lines of CDK we cat-ed above has turned into.
-1. Run `cdk bootstrap`
-1. Deploy that with a `cdk deploy`
-1. Answer `y` to the security confirmation and press Enter
+1. Run `cdk bootstrap` to create an S3 artifact bucket CDK needs
+1. Deploy that with a `cdk deploy` to both generate the CloudFormation template as above as well upload it to the artifact bucket and then call the AWS APIs to deploy that CloudFormation template.
+1. Answer `y` to the security confirmation and press Enter (it will show you any IAM and Security Group/firewall changes that will happen if you proceed)
 
 ## Windows Containers
 
@@ -211,9 +210,9 @@ Push our new nyancat-windows image to ECR:
 Now we'll take our nyancat container and run it on ECS
 
 Go back to your terminal in Cloud9 and:
-1. Run `sudo npm install -g aws-cdk`
+1. Run `nvm install --lts` to switch back to the lts version we installed above (since it is already installed this should be quick)
 1. Run `cd ~/environment/docker-ecs-immersion/windows`
-1. Run `pip install -r requirements.txt`
+1. Run `pip install -r requirements.txt` to install the necessary python packages from pip.
 1. Run `cdk deploy`
 1. Go to the ALB address output at the end of the deployment to see our nyancat hosted by IIS on Windows via ECS
 
@@ -226,6 +225,7 @@ The easiest way to test this is using Docker-in-Docker on the Cloud9 that we've 
 The Dockerfile in the ecsanywhere folder will build an Amazon Linux 2 container that has both systemd and docker that can serve as an ECS Anywhere sandbox for us.
 
 On the Cloud9:
+1. We need to free some disk space before proceeding as the Cloud9 only has 10GB - there are a number of unneeded docker images pre-loaded on the Cloud9 that we can clean to do that. Run `docker rmi -f $(docker images -a -q)` which will remove all the locally cached images.
 1. `cd ~/environment/docker-ecs-immersion/ecsanywhere`
 1. `docker build -t ecsanywhere-dind .`
 1. `docker run -d --privileged --name ecsanywhere -p 8080-8090:8080-8090 ecsanywhere-dind:latest`
