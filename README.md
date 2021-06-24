@@ -149,7 +149,7 @@ However, we have added [higher-level constructs](https://docs.aws.amazon.com/cdk
 1. Run `cdk synth` to generate the CloudFormation template from our CDK template
 1. Note that this is the CloudFormation that the few lines of CDK we cat-ed above has turned into.
 1. Run `cdk bootstrap` to create an S3 artifact bucket CDK needs
-1. Deploy that with a `cdk deploy` to both generate the CloudFormation template as above as well upload it to the artifact bucket and then call the AWS APIs to deploy that CloudFormation template.
+1. Deploy that with a `cdk deploy` to build our container locally, generate the CloudFormation template as above (as well upload it to the artifact bucket) and then call the AWS APIs to deploy that CloudFormation template. As part of that the local cdk CLI will also push the local image it (re)builds up to the new ECR it creates as part of that process as well.
 1. Answer `y` to the security confirmation and press Enter (it will show you any IAM and Security Group/firewall changes that will happen if you proceed)
 
 ## Windows Containers
